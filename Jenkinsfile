@@ -19,8 +19,9 @@ pipeline {
         // This is the port you'll use in your browser (http://localhost:8000).
         HOST_PORT = "8000"
 
-        // The port your Node.js application actually listens on inside the Docker container (3000).
-        APP_PORT = "3000"
+        // The port your HTML/CSS/JS web server inside the Docker container listens on (typically 80 for Nginx/Apache).
+        APP_PORT = "80" // Changed from 3000 to 80 for static web apps
+
     }
 
     // Stages define a series of steps to be executed in the pipeline.
@@ -42,8 +43,12 @@ pipeline {
             steps {
                 script {
                     // Build the Docker image using the Dockerfile located in the current directory.
-                    // The '-t' flag tags the image with the name and build number defined in DOCKER_IMAGE.
-                    // The '.' indicates that the Dockerfile is in the current directory (workspace).
+                    // Ensure your Dockerfile is set up to serve HTML/CSS/JS (e.g., using Nginx).
+                    // Example Dockerfile content for static files:
+                    // FROM nginx:alpine
+                    // COPY . /usr/share/nginx/html
+                    // EXPOSE 80
+                    // CMD ["nginx", "-g", "daemon off;"]
                     sh "docker build -t ${DOCKER_IMAGE} ."
                     echo "Docker image ${DOCKER_IMAGE} built successfully."
                 }
@@ -51,11 +56,10 @@ pipeline {
         }
 
         // Stage 3: (Optional) Run tests.
-        // In a real application, you'd execute your unit, integration, or linting tests here.
+        // For static web apps, this might involve linting HTML/CSS/JS, or running Lighthouse/accessibility checks.
         stage('Test') {
             steps {
-                echo "Running application tests (this is a placeholder for actual tests like 'npm test')."
-                // Example: sh "npm test" (if you had a 'test' script in your package.json)
+                echo "Running application tests (this is a placeholder for actual tests like HTML/CSS/JS linting or Lighthouse checks)."
             }
         }
 
